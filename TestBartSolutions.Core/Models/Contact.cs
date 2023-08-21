@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace TestBartSolutions.Models;
+namespace TestBartSolutions.Core.Models;
 
 [Index(nameof(Email), IsUnique = true)]
 public class Contact

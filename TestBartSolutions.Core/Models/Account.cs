@@ -1,8 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 
-namespace TestBartSolutions.Models;
+namespace TestBartSolutions.Core.Models;
 
 [Index(nameof(Name), IsUnique = true)]
 public class Account

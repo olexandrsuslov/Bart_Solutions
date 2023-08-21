@@ -1,4 +1,4 @@
-namespace TestBartSolutions.DbContext;
+namespace TestBartSolutions.Infrastructure.DbContext;
 
 public static class StringGenerator
 {

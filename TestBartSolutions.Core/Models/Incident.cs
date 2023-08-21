@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TestBartSolutions.Models;
+namespace TestBartSolutions.Core.Models;
 
 public class Incident
 {

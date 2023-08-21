@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TestBartSolutions.DbContext;
-using TestBartSolutions.Models;
+using TestBartSolutions.Application.Repositories;
+using TestBartSolutions.Core.Models;
+
 
 namespace TestBartSolutions.Controllers
 {
@@ -14,33 +11,35 @@ namespace TestBartSolutions.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        private readonly AccountsContext _context;
+        private readonly IContactRepository _repository;
 
-        public ContactController(AccountsContext context)
+        public ContactController(IContactRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        // GET: api/Contact
+        [HttpGet]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Contact>>> GetContacts()
         {
-          if (_context.Contacts == null)
-          {
-              return NotFound();
-          }
-            return await _context.Contacts.ToListAsync();
+            var contacts = await _repository.GetAll();
+            if (!contacts.Any())
+            {
+                return NotFound();
+            }
+            return new ActionResult<IEnumerable<Contact>>(contacts);
         }
 
-        // GET: api/Contact/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Contact>> GetContact(int id)
         {
-          if (_context.Contacts == null)
-          {
-              return NotFound();
-          }
-            var contact = await _context.Contacts.FindAsync(id);
+            var contacts = await _repository.GetAll();
+            if (!contacts.Any())
+            {
+                return NotFound();
+            }
+            
+            var contact = await _repository.GetById(id);
 
             if (contact == null)
             {
@@ -50,8 +49,6 @@ namespace TestBartSolutions.Controllers
             return contact;
         }
 
-        // PUT: api/Contact/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutContact(int id, Contact contact)
         {
@@ -59,66 +56,50 @@ namespace TestBartSolutions.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(contact).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.Update(id,contact);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ContactExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
         }
 
-        // POST: api/Contact
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Contact>> PostContact(Contact contact)
         {
-          if (_context.Contacts == null)
-          {
-              return Problem("Entity set 'AccountsContext.Contacts'  is null.");
-          }
-            _context.Contacts.Add(contact);
-            await _context.SaveChangesAsync();
+            var contacts = await _repository.GetAll();
+            if (!contacts.Any())
+            {
+                return Problem("Entity set 'APIContext.Contacts'  is null.");
+            }
+            
+            _repository.Add(contact);
 
             return CreatedAtAction("GetContact", new { id = contact.Id }, contact);
         }
 
-        // DELETE: api/Contact/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteContact(int id)
         {
-            if (_context.Contacts == null)
+            if (_repository.GetAll() == null)
             {
                 return NotFound();
             }
-            var contact = await _context.Contacts.FindAsync(id);
+
+            var contact = await _repository.GetById(id);
             if (contact == null)
             {
                 return NotFound();
             }
 
-            _context.Contacts.Remove(contact);
-            await _context.SaveChangesAsync();
+            _repository.Delete(id);
 
             return NoContent();
         }
 
-        private bool ContactExists(int id)
-        {
-            return (_context.Contacts?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
     }
 }

@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Storage;
-using TestBartSolutions.Models;
+using TestBartSolutions.Core.Models;
 
-namespace TestBartSolutions.DbContext;
+namespace TestBartSolutions.Infrastructure.DbContext;
 
-public class AccountsContext : Microsoft.EntityFrameworkCore.DbContext
+public class APIContext : Microsoft.EntityFrameworkCore.DbContext
 {
     public DbSet<Contact> Contacts { get; set; }
     public DbSet<Account> Accounts { get; set; }
@@ -33,16 +33,16 @@ public class AccountsContext : Microsoft.EntityFrameworkCore.DbContext
         return base.SaveChanges();
     }
     
-    public AccountsContext(DbContextOptions<AccountsContext> options)
+    public APIContext(DbContextOptions<APIContext> options)
         : base(options)
     {
         Database.EnsureCreated();
     }
-    public AccountsContext CreateDbContext(string[] args)
+    public APIContext CreateDbContext(string[] args)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<AccountsContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<APIContext>();
         optionsBuilder.UseSqlServer("Data Source=localhost;Initial Catalog=master;User=SA;Password=reallyStrongPwd123;TrustServerCertificate=true"); 
-        return new AccountsContext(optionsBuilder.Options); 
+        return new APIContext(optionsBuilder.Options); 
     }
     
 
